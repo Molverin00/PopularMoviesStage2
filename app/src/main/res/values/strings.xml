@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">Popular Movies - Stage 2</string>
+
+    <string name="image_view_poster_content_description">Movie poster</string>
+    <string name="tv_label_videos">Videos</string>
+    <string name="tv_label_reviews">Reviews</string>
+    <string name="tv_label_synopsis">Overview</string>
+
+    <string name="menu_sort_item_label_popular">Popular</string>
+    <string name="menu_sort_item_label_top_rated">Top Rated</string>
+    <string name="menu_sort_item_label_favorites">My Favorites</string>
+
+    <string name="activity_label_popular">Popular Movies</string>
+    <string name="activity_label_top_rated">Top Rated Movies</string>
+    <string name="activity_label_favorites">My Favorites</string>
+
+    <string name="btn_favorite_label_on">Favorite</string>
+    <string name="btn_favorite_label_off">Mark as Favorite</string>
+
 </resources>
