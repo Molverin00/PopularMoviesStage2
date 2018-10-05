@@ -22,4 +22,9 @@ Since this application uses a RESTful API to retrieve movie data, an API key is 
 * Picasso
 
 ## Screenshots
-<img width="35%" src="" />
+<img width="35%" src="screenshots/Screenshot_1538703466.png" />
+<img width="35%" src="screenshots/Screenshot_1538703475.png" />
+<img width="35%" src="screenshots/Screenshot_1538703480.png" />
+<img width="35%" src="screenshots/Screenshot_1538703557.png" />
+<img width="35%" src="screenshots/Screenshot_1538703590.png" />
+<img width="35%" src="screenshots/Screenshot_1538703607.png" />
