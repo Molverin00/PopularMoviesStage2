@@ -18,7 +18,10 @@ public interface FavoriteMovieDao {
     LiveData<List<Movie>> loadAllFavMovies();
 
     @Query("SELECT * FROM favorites WHERE movie_id LIKE :movieId")
-    Movie findFavById(String movieId);
+    LiveData<Movie> findFavById(String movieId);
+
+    @Query("SELECT * FROM favorites WHERE movie_id LIKE :movieId")
+    Movie findMovieById(String movieId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertFavoriteMovie(Movie favoriteMovie);

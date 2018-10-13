@@ -1,5 +1,6 @@
 package com.example.marouen.popularmovies_stage2.activity;
 
+import android.arch.lifecycle.LiveData;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -53,6 +54,7 @@ public class DetailActivity extends AppCompatActivity {
     private List<Video> videosList;
     private List<Review> reviewsList;
 
+
     @BindView(R.id.tv_title) TextView titleTextView;
     @BindView(R.id.tv_user_rating) TextView userRatingTextView;
     @BindView(R.id.tv_release_date) TextView releaseDateTextView;
@@ -92,6 +94,8 @@ public class DetailActivity extends AppCompatActivity {
         mReleaseDate = intent.getStringExtra("release_date");
         mPosterUrl = intent.getStringExtra("poster_url");
 
+        final Movie movie = new Movie(mId, mTitle, mPosterUrl, mSynopsis, mRating, mReleaseDate);
+
         //Set text views
         titleTextView.setText(mTitle);
         synopsisTextView.setText(mSynopsis);
@@ -111,18 +115,17 @@ public class DetailActivity extends AppCompatActivity {
         // Fetch movie reviews
         loadReviews(apiService);
 
-        final Movie movie = new Movie(mId, mTitle, mPosterUrl, mSynopsis, mRating, mReleaseDate);
+
 
 
         // Set Favorite button
-        AppExecutors.getInstance().diskIO().execute(() -> {
-
-            if(mDb.favoriteMovieDao().findFavById(mId) != null) {
-                runOnUiThread(() -> favoriteToggleButton.setChecked(true));
+        final LiveData<Movie> movieLiveData = mDb.favoriteMovieDao().findFavById(mId);
+        movieLiveData.observe(this, movie1 -> {
+            if (movie1 != null) {
+                favoriteToggleButton.setChecked(true);
             } else {
-                runOnUiThread(() -> favoriteToggleButton.setChecked(false));
+                favoriteToggleButton.setChecked(false);
             }
-
         });
 
 
@@ -141,7 +144,7 @@ public class DetailActivity extends AppCompatActivity {
             } else {
 
                 AppExecutors.getInstance().diskIO().execute(() ->
-                        mDb.favoriteMovieDao().deleteFavoriteMovie(mDb.favoriteMovieDao().findFavById(mId)));
+                        mDb.favoriteMovieDao().deleteFavoriteMovie(mDb.favoriteMovieDao().findMovieById(mId)));
 
                 favoriteToggleButton.setChecked(false);
                 toastMessage = "Removed from Favorites";

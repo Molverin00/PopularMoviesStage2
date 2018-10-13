@@ -11,6 +11,7 @@ import com.example.marouen.popularmovies_stage2.model.Movie;
 public abstract class AppDatabase extends RoomDatabase {
 
     private static final String LOG_TAG = AppDatabase.class.getSimpleName();
+
     public abstract FavoriteMovieDao favoriteMovieDao();
 
     private static final String DATABASE_NAME = "favorites";
