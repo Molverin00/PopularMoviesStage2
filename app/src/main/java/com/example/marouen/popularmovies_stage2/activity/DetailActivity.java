@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.example.marouen.popularmovies_stage2.AppExecutors;
 import com.example.marouen.popularmovies_stage2.BuildConfig;
 import com.example.marouen.popularmovies_stage2.R;
 import com.example.marouen.popularmovies_stage2.adapter.ReviewAdapter;
@@ -110,16 +111,19 @@ public class DetailActivity extends AppCompatActivity {
         // Fetch movie reviews
         loadReviews(apiService);
 
+        final Movie movie = new Movie(mId, mTitle, mPosterUrl, mSynopsis, mRating, mReleaseDate);
 
 
         // Set Favorite button
-        if (isFavorite(mId))
+        AppExecutors.getInstance().diskIO().execute(() -> {
 
-            favoriteToggleButton.setChecked(true);
-        else
+            if(mDb.favoriteMovieDao().findFavById(mId) != null) {
+                runOnUiThread(() -> favoriteToggleButton.setChecked(true));
+            } else {
+                runOnUiThread(() -> favoriteToggleButton.setChecked(false));
+            }
 
-            favoriteToggleButton.setChecked(false);
-
+        });
 
 
         favoriteToggleButton.setOnClickListener(v -> {
@@ -128,15 +132,16 @@ public class DetailActivity extends AppCompatActivity {
 
             if (favoriteToggleButton.isChecked()) {
 
-                mDb.favoriteMovieDao().insertFavoriteMovie(
-                        new Movie(mId, mTitle, mPosterUrl, mSynopsis, mRating, mReleaseDate)
-                );
+                AppExecutors.getInstance().diskIO().execute(() ->
+                        mDb.favoriteMovieDao().insertFavoriteMovie(movie));
 
                 favoriteToggleButton.setChecked(true);
                 toastMessage = "Added to Favorites";
+
             } else {
 
-                mDb.favoriteMovieDao().deleteFavoriteMovie(mDb.favoriteMovieDao().findFavById(mId));
+                AppExecutors.getInstance().diskIO().execute(() ->
+                        mDb.favoriteMovieDao().deleteFavoriteMovie(mDb.favoriteMovieDao().findFavById(mId)));
 
                 favoriteToggleButton.setChecked(false);
                 toastMessage = "Removed from Favorites";
@@ -203,17 +208,5 @@ public class DetailActivity extends AppCompatActivity {
                 t.printStackTrace();
             }
         });
-    }
-
-
-
-    /*
-    Check if current movie is in Favorites local database
-     */
-    private boolean isFavorite(String movieId) {
-
-        Movie movie = mDb.favoriteMovieDao().findFavById(movieId);
-
-        return movie != null;
     }
 }

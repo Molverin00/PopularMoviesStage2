@@ -28,8 +28,4 @@ public class MainActivityViewModel extends AndroidViewModel {
     public LiveData<List<Movie>> getMovieList() {
         return movieList;
     }
-
-    public void setMovieList(LiveData<List<Movie>> movieList) {
-        this.movieList = movieList;
-    }
 }

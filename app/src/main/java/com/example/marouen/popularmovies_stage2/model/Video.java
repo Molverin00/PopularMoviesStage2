@@ -52,16 +52,8 @@ public class Video {
         return site;
     }
 
-    public void setSite(String site) {
-        this.site = site;
-    }
-
     public String getType() {
         return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
 
