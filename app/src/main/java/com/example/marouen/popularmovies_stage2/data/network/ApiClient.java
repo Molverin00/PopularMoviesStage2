@@ -1,4 +1,4 @@
-package com.example.marouen.popularmovies_stage2.api;
+package com.example.marouen.popularmovies_stage2.data.network;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

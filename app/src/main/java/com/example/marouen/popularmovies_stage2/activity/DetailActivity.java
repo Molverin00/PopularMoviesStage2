@@ -1,13 +1,12 @@
 package com.example.marouen.popularmovies_stage2.activity;
 
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,9 +16,10 @@ import com.example.marouen.popularmovies_stage2.BuildConfig;
 import com.example.marouen.popularmovies_stage2.R;
 import com.example.marouen.popularmovies_stage2.adapter.ReviewAdapter;
 import com.example.marouen.popularmovies_stage2.adapter.VideoAdapter;
-import com.example.marouen.popularmovies_stage2.api.ApiClient;
-import com.example.marouen.popularmovies_stage2.api.ApiService;
-import com.example.marouen.popularmovies_stage2.database.FavoriteMoviesContract;
+import com.example.marouen.popularmovies_stage2.data.network.ApiClient;
+import com.example.marouen.popularmovies_stage2.data.network.ApiService;
+import com.example.marouen.popularmovies_stage2.data.database.AppDatabase;
+import com.example.marouen.popularmovies_stage2.model.Movie;
 import com.example.marouen.popularmovies_stage2.model.Review;
 import com.example.marouen.popularmovies_stage2.model.ReviewsResult;
 import com.example.marouen.popularmovies_stage2.model.Video;
@@ -37,6 +37,8 @@ import retrofit2.Response;
 public class DetailActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = DetailActivity.class.getSimpleName();
+
+    private AppDatabase mDb;
 
     private final String BASE_URL = "http://image.tmdb.org/t/p/";
     private final String POSTER_SIZE = "w185";
@@ -70,6 +72,8 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
 
+        mDb = AppDatabase.getInstance(getApplicationContext());
+
         LinearLayoutManager videosLinearLayoutManager = new LinearLayoutManager(this);
         videosRecyclerView.setLayoutManager(videosLinearLayoutManager);
         videosRecyclerView.setHasFixedSize(false);
@@ -81,7 +85,7 @@ public class DetailActivity extends AppCompatActivity {
 
         // Get movie details from intent
         Intent intent = getIntent();
-        mId = String.valueOf(intent.getIntExtra("movie_id", 0));
+        mId = intent.getStringExtra("movie_id");
         mTitle = intent.getStringExtra("original_title");
         mSynopsis = intent.getStringExtra("synopsis");
         mRating = intent.getStringExtra("user_rating");
@@ -107,6 +111,8 @@ public class DetailActivity extends AppCompatActivity {
         // Fetch movie reviews
         loadReviews(apiService);
 
+
+
         // Set Favorite button
         if (isFavorite(mId))
 
@@ -123,16 +129,15 @@ public class DetailActivity extends AppCompatActivity {
 
             if (favoriteToggleButton.isChecked()) {
 
-                // Add to local database
-                insertFavorite(mId, mTitle, mPosterUrl, mSynopsis, mRating, mReleaseDate);
+                mDb.favoriteMovieDao().insertFavoriteMovie(
+                        new Movie(mId, mTitle, mPosterUrl, mSynopsis, mRating, mReleaseDate)
+                );
 
                 favoriteToggleButton.setChecked(true);
                 toastMessage = "Added to Favorites";
-
             } else {
 
-                // Delete from database
-                deleteFavorite(mId);
+                mDb.favoriteMovieDao().deleteFavoriteMovie(mDb.favoriteMovieDao().findFavById(mId));
 
                 favoriteToggleButton.setChecked(false);
                 toastMessage = "Removed from Favorites";
@@ -208,49 +213,8 @@ public class DetailActivity extends AppCompatActivity {
      */
     private boolean isFavorite(String movieId) {
 
-        String WHERE_PARAM = FavoriteMoviesContract.FavoriteEntry.COLUMN_MOVIE_ID + " =?";
+        Movie movie = mDb.favoriteMovieDao().findFavById(movieId);
 
-        Cursor cursor = getContentResolver()
-                .query(FavoriteMoviesContract.FavoriteEntry.CONTENT_URI,null, WHERE_PARAM, new String[]{movieId},null);
-
-        boolean favorite = false;
-        if (cursor != null && cursor.moveToFirst()) {
-            favorite = true;
-            cursor.close();
-        }
-
-        return favorite;
-    }
-
-
-
-    /*
-    Insert movie into Favorite local database
-     */
-    private void insertFavorite(String movieId, String originalTitle, String posterUrl, String synopsis, String userRating, String releaseDate){
-
-        ContentValues values = new ContentValues();
-        values.put(FavoriteMoviesContract.FavoriteEntry.COLUMN_MOVIE_ID, movieId);
-        values.put(FavoriteMoviesContract.FavoriteEntry.COLUMN_MOVIE_TITLE, originalTitle);
-        values.put(FavoriteMoviesContract.FavoriteEntry.COLUMN_MOVIE_POSTER_URL, posterUrl);
-        values.put(FavoriteMoviesContract.FavoriteEntry.COLUMN_MOVIE_SYNOPSIS, synopsis);
-        values.put(FavoriteMoviesContract.FavoriteEntry.COLUMN_MOVIE_USER_RATING, userRating);
-        values.put(FavoriteMoviesContract.FavoriteEntry.COLUMN_MOVIE_RELEASE_DATE, releaseDate);
-
-        getContentResolver().
-                insert(FavoriteMoviesContract.FavoriteEntry.CONTENT_URI, values);
-    }
-
-
-
-    /*
-    Delete current movie from Favorite local database
-     */
-    private void deleteFavorite(String movieId) {
-
-        String WHERE_PARAM = FavoriteMoviesContract.FavoriteEntry.COLUMN_MOVIE_ID + " =?";
-
-        getContentResolver()
-                .delete(FavoriteMoviesContract.FavoriteEntry.CONTENT_URI, WHERE_PARAM, new String[]{movieId});
+        return movie != null;
     }
 }

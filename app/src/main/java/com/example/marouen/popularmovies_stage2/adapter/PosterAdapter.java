@@ -47,7 +47,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.MovieViewH
     public void onBindViewHolder(@NonNull MovieViewHolder movieViewHolder, int i) {
 
         Movie movie = movieList.get(i);
-        String posterPath = BASE_URL + POSTER_SIZE + movie.getPosterUrl();
+        String posterPath = BASE_URL + POSTER_SIZE + movie.getPosterPath();
 
         // Set movie poster
         Picasso.with(mContext).load(posterPath).into(movieViewHolder.posterImageView);
@@ -55,12 +55,12 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.MovieViewH
         // Set OnClickListener on image
         movieViewHolder.posterImageView.setOnClickListener(v -> {
 
-            Log.d(LOG_TAG, String.valueOf(movie.getId()) + " : " + movie.getOriginalTitle());
+            Log.d(LOG_TAG, movie.getMovieId() + " : " + movie.getOriginalTitle());
 
             // Go to movie details activity
             Intent intent = new Intent(mContext, DetailActivity.class);
-            intent.putExtra("movie_id", movie.getId());
-            intent.putExtra("poster_url", movie.getPosterUrl());
+            intent.putExtra("movie_id", movie.getMovieId());
+            intent.putExtra("poster_url", movie.getPosterPath());
             intent.putExtra("original_title", movie.getOriginalTitle());
             intent.putExtra("synopsis",movie.getSynopsis());
             intent.putExtra("user_rating", movie.getUserRating());

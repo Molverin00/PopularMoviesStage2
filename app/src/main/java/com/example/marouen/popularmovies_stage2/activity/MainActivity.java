@@ -2,7 +2,6 @@ package com.example.marouen.popularmovies_stage2.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,14 +10,13 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.example.marouen.popularmovies_stage2.BuildConfig;
 import com.example.marouen.popularmovies_stage2.R;
 import com.example.marouen.popularmovies_stage2.adapter.PosterAdapter;
-import com.example.marouen.popularmovies_stage2.api.ApiClient;
-import com.example.marouen.popularmovies_stage2.api.ApiService;
-import com.example.marouen.popularmovies_stage2.database.FavoriteMoviesContract;
+import com.example.marouen.popularmovies_stage2.data.network.ApiClient;
+import com.example.marouen.popularmovies_stage2.data.network.ApiService;
+import com.example.marouen.popularmovies_stage2.data.database.AppDatabase;
 import com.example.marouen.popularmovies_stage2.model.Movie;
 import com.example.marouen.popularmovies_stage2.model.MoviesResult;
 
@@ -35,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    private AppDatabase mDb;
+
     private SharedPreferences sharedPreferences;
     private String sort_type;
 
@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        mDb = AppDatabase.getInstance(getApplicationContext());
 
         GridLayoutManager moviesGridLayoutManager = new GridLayoutManager(this, 2);
         moviesRecyclerView.setLayoutManager(moviesGridLayoutManager);
@@ -76,25 +78,7 @@ public class MainActivity extends AppCompatActivity {
                 loadFavoritesMovies();
                 break;
         }
-
-        /*
-        if(sort_type.equals("popular"))
-            setTitle(R.string.activity_label_popular);
-        else if(sort_type.equals("top_rated"))
-            setTitle(R.string.activity_label_top_rated);
-        else if(sort_type.equals("favorites"))
-            setTitle(R.string.activity_label_favorites);
-
-        moviesList = new ArrayList<>();
-
-        if(sort_type.equals("favorites"))
-
-            loadFavoritesMovies();
-        else
-
-            loadMovies(); */
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -176,57 +160,18 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
-    /*
-    Fetch favorites movies from local database
-     */
     private void loadFavoritesMovies() {
 
-        /* To query all records */
-        Cursor cursor = getContentResolver()
-                .query(FavoriteMoviesContract.FavoriteEntry.CONTENT_URI,null,null,null,null);
+        moviesList = mDb.favoriteMovieDao().loadAllFavMovies();
 
-
-        if (cursor != null && cursor.moveToFirst()) { //If there are existing favorite items
-
-            moviesList = new ArrayList<>();
-            Movie movie;
-
-            Log.d(LOG_TAG, String.valueOf(cursor.getCount()));
-
-            while (!cursor.isAfterLast()) {
-
-                movie = new Movie(
-
-                        Integer.valueOf(cursor.getString(cursor.getColumnIndex(FavoriteMoviesContract.FavoriteEntry.COLUMN_MOVIE_ID))),
-                        cursor.getString(cursor.getColumnIndex(FavoriteMoviesContract.FavoriteEntry.COLUMN_MOVIE_TITLE)),
-                        cursor.getString(cursor.getColumnIndex(FavoriteMoviesContract.FavoriteEntry.COLUMN_MOVIE_POSTER_URL)),
-                        cursor.getString(cursor.getColumnIndex(FavoriteMoviesContract.FavoriteEntry.COLUMN_MOVIE_SYNOPSIS)),
-                        cursor.getString(cursor.getColumnIndex(FavoriteMoviesContract.FavoriteEntry.COLUMN_MOVIE_USER_RATING)),
-                        cursor.getString(cursor.getColumnIndex(FavoriteMoviesContract.FavoriteEntry.COLUMN_MOVIE_RELEASE_DATE))
-                );
-
-                Log.d(LOG_TAG, movie.toString());
-
-                moviesList.add(movie);
-
-                cursor.moveToNext();
-            }
-
-            cursor.close();
-
-            // Populate movies grid view
-            posterAdapter = new PosterAdapter(MainActivity.this, moviesList);
-            moviesRecyclerView.setAdapter(posterAdapter);
-
-
-        } else {
-            Toast.makeText(this, "Favorites is empty", Toast.LENGTH_SHORT).show();
+        for(Movie movie: moviesList) {
+            Log.d(LOG_TAG, movie.toString());
         }
 
+        // Populate movies grid view
+        posterAdapter = new PosterAdapter(MainActivity.this, moviesList);
+        moviesRecyclerView.setAdapter(posterAdapter);
     }
-
 
 
     private void refreshMainActivity() {

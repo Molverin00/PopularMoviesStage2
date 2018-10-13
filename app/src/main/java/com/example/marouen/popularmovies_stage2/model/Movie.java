@@ -1,39 +1,80 @@
 package com.example.marouen.popularmovies_stage2.model;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
+@Entity(tableName = "favorites")
 public class Movie {
 
+    @PrimaryKey(autoGenerate = true)
+    private int _id;
+
+    @ColumnInfo(name = "movie_id")
     @SerializedName("id")
-    private Integer id;
+    private String movieId;
+
+    @ColumnInfo(name = "original_title")
     @SerializedName("original_title")
     private String originalTitle;
+
+    @ColumnInfo(name = "poster_path")
     @SerializedName("poster_path")
-    private String posterUrl;
+    private String posterPath;
+
+    @ColumnInfo(name = "synopsis")
     @SerializedName("overview")
     private String synopsis;
+
+    @ColumnInfo(name = "user_rating")
     @SerializedName("vote_average")
     private String userRating;
+
+    @ColumnInfo(name = "release_date")
     @SerializedName("release_date")
     private String releaseDate;
 
-    public Movie(Integer id, String originalTitle, String posterUrl, String synopsis, String userRating, String releaseDate) {
-        this.id = id;
+
+    public Movie(int id, String movieId, String originalTitle, String posterPath, String synopsis, String userRating, String releaseDate) {
+        this._id = id;
+        this.movieId = movieId;
         this.originalTitle = originalTitle;
-        this.posterUrl = posterUrl;
+        this.posterPath = posterPath;
         this.synopsis = synopsis;
         this.userRating = userRating;
         this.releaseDate = releaseDate;
     }
 
-    public Integer getId() {
-        return id;
+
+    @Ignore
+    public Movie(String movieId, String originalTitle, String posterPath, String synopsis, String userRating, String releaseDate) {
+        this.movieId = movieId;
+        this.originalTitle = originalTitle;
+        this.posterPath = posterPath;
+        this.synopsis = synopsis;
+        this.userRating = userRating;
+        this.releaseDate = releaseDate;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+
+    public int getId() {
+        return _id;
+    }
+
+    public void setId(int id) {
+        this._id = id;
+    }
+
+    public String getMovieId() {
+        return movieId;
+    }
+
+    public void setMovieId(String movieId) {
+        this.movieId = movieId;
     }
 
     public String getOriginalTitle() {
@@ -44,12 +85,12 @@ public class Movie {
         this.originalTitle = originalTitle;
     }
 
-    public String getPosterUrl() {
-        return posterUrl;
+    public String getPosterPath() {
+        return posterPath;
     }
 
-    public void setPosterUrl(String posterUrl) {
-        this.posterUrl = posterUrl;
+    public void setPosterPath(String posterPath) {
+        this.posterPath = posterPath;
     }
 
     public String getSynopsis() {
@@ -76,13 +117,15 @@ public class Movie {
         this.releaseDate = releaseDate;
     }
 
+
     @NonNull
     @Override
     public String toString() {
         return "Movie{" +
-                "id=" + id +
+                "id=" + _id +
+                ", movieId='" + movieId + '\'' +
                 ", originalTitle='" + originalTitle + '\'' +
-                ", posterUrl='" + posterUrl + '\'' +
+                ", posterPath='" + posterPath + '\'' +
                 ", synopsis='" + synopsis + '\'' +
                 ", userRating='" + userRating + '\'' +
                 ", releaseDate='" + releaseDate + '\'' +
