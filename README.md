@@ -11,15 +11,19 @@ Since this application uses a RESTful API to retrieve movie data, an API key is 
 * Read users reviews for each movie
 
 ## Concepts Applied
+* Android Architecture components (LiveData, ViewModel, Room)
+* Lifecycle awareness
+* App Executors for Threading
+* SQLite Database (not re-queried unnecessarily)
 * REST calls to The Movie DB API
-* ContentProviders for storing and retrieving SQLite data
 * Implicit Intents to launch the YouTube app
-* Activity Lifecycle
 
 ## Libraries used
 * Butter Knife
 * Retrofit
 * Picasso
+* Room
+* Lifecycle (LiveData and ViewModel)
 
 ## Screenshots
 <img width="35%" src="screenshots/Screenshot_1538703466.png" />
