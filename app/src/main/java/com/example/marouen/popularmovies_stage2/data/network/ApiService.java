@@ -1,6 +1,5 @@
 package com.example.marouen.popularmovies_stage2.data.network;
 
-import com.example.marouen.popularmovies_stage2.model.Movie;
 import com.example.marouen.popularmovies_stage2.model.MoviesResult;
 import com.example.marouen.popularmovies_stage2.model.ReviewsResult;
 import com.example.marouen.popularmovies_stage2.model.VideosResult;

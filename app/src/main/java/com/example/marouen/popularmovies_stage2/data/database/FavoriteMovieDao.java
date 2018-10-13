@@ -15,7 +15,7 @@ import java.util.List;
 public interface FavoriteMovieDao {
 
     @Query("SELECT * FROM favorites")
-    List<Movie> loadAllFavMovies();
+    LiveData<List<Movie>> loadAllFavMovies();
 
     @Query("SELECT * FROM favorites WHERE movie_id LIKE :movieId")
     Movie findFavById(String movieId);

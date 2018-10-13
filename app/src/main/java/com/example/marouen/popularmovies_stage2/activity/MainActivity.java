@@ -1,5 +1,6 @@
 package com.example.marouen.popularmovies_stage2.activity;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
@@ -7,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -16,9 +16,9 @@ import com.example.marouen.popularmovies_stage2.R;
 import com.example.marouen.popularmovies_stage2.adapter.PosterAdapter;
 import com.example.marouen.popularmovies_stage2.data.network.ApiClient;
 import com.example.marouen.popularmovies_stage2.data.network.ApiService;
-import com.example.marouen.popularmovies_stage2.data.database.AppDatabase;
 import com.example.marouen.popularmovies_stage2.model.Movie;
 import com.example.marouen.popularmovies_stage2.model.MoviesResult;
+import com.example.marouen.popularmovies_stage2.viewModel.MainActivityViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    private AppDatabase mDb;
 
     private SharedPreferences sharedPreferences;
     private String sort_type;
@@ -48,8 +47,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-        mDb = AppDatabase.getInstance(getApplicationContext());
 
         GridLayoutManager moviesGridLayoutManager = new GridLayoutManager(this, 2);
         moviesRecyclerView.setLayoutManager(moviesGridLayoutManager);
@@ -162,15 +159,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadFavoritesMovies() {
 
-        moviesList = mDb.favoriteMovieDao().loadAllFavMovies();
-
-        for(Movie movie: moviesList) {
-            Log.d(LOG_TAG, movie.toString());
-        }
-
-        // Populate movies grid view
-        posterAdapter = new PosterAdapter(MainActivity.this, moviesList);
-        moviesRecyclerView.setAdapter(posterAdapter);
+        MainActivityViewModel mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+        mainActivityViewModel.getMovieList().observe(this, movieList -> {
+            posterAdapter = new PosterAdapter(MainActivity.this, movieList);
+            moviesRecyclerView.setAdapter(posterAdapter);
+        });
     }
 
 
